@@ -59,10 +59,28 @@ end
 %% frequency selective load impedance=load origin+load plc
 
 
-Y_L2_PLC=[1/50,0;0,1/50];
-Y_Lb_PLC=[1/50,0;0,1/50];
+
 Y_L2=zeros(NCond2-1,NCond2-1,length(f));
 Y_Lb=zeros(NCondb-1,NCondb-1,length(f));
+
+
+
+
+%% length
+lenb=3.3;
+len1=4.5;
+len2=5.5;
+testN=100;
+
+P=10^(15/10);%15dB
+HPosition=zeros(NCond2-1,NCond1-1,length(f),testN);
+HePosition=zeros(NCondb-1,NCond1-1,length(f),testN);
+%% generate testN 
+for i=1: testN
+var_plc_y=1/(10*i);
+    
+Y_L2_PLC=[var_plc_y,0;0,var_plc_y];
+Y_Lb_PLC=[var_plc_y,0;0,var_plc_y];
   
 Y_L2(1,1,:)=load_fs.Load(1,:,:)+Y_L2_PLC(1,1)*zeros(1,1,length(f));
 Y_L2(1,2,:)=load_fs.Load(2,:,:)+Y_L2_PLC(1,2)*zeros(1,1,length(f));
@@ -72,22 +90,8 @@ Y_Lb(1,1,:)=load_fs.Load(4,:,:)+Y_Lb_PLC(1,1)*zeros(1,1,length(f));
 Y_Lb(1,2,:)=load_fs.Load(5,:,:)+Y_Lb_PLC(1,1)*zeros(1,1,length(f));
 Y_Lb(2,1,:)=load_fs.Load(5,:,:)+Y_Lb_PLC(1,1)*zeros(1,1,length(f));
 Y_Lb(2,2,:)=load_fs.Load(6,:,:)+Y_Lb_PLC(1,1)*zeros(1,1,length(f));
-
-
-%% length
-lenb=3.3;
-line12=10;
-testN=100;
-
-P=10^(15/10);%15dB
-HPosition=zeros(NCond2-1,NCond1-1,length(f),testN);
-HePosition=zeros(NCondb-1,NCond1-1,length(f),testN);
-%% generate testN 
-for i=1: testN
-    len1=line12/testN * i;
-    len2=line12-len1;
     
     [HPosition(:,:,:,i),HePosition(:,:,:,i)]=TF_222(f,Y1,Z1,len1,Y2,Z2,len2,Y_L2,Yb,Zb,lenb,Y_Lb);
  
 end
-save('data_H_Position','HPosition','HePosition');
+save('data_H_PLCY','HPosition','HePosition');
